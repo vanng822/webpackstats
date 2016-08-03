@@ -6,28 +6,29 @@ import (
 	"os"
 )
 
-type webpackStats struct {
+type WebpackStats struct {
 	Status  string                  `json:"status"`
-	Chunks  map[string][]chunkEntry `json:"chunks"`
+	Chunks  map[string][]ChunkEntry `json:"chunks"`
 	Error   string                  `json:"error"`
 	Message string                  `json:"message"`
+	File    string                  `json:"file"`
 }
 
 // general output
-type chunkEntry struct {
+type ChunkEntry struct {
 	Name       string `json:"name"`
 	Path       string `json:"path"`
 	PublicPath string `json:"publicPath"`
 }
 
-func load(filename string) *webpackStats {
+func load(filename string) *WebpackStats {
 	file, err := os.Open(filename)
 	if err != nil {
 		panic(err)
 	}
 	defer file.Close()
 	decoder := json.NewDecoder(file)
-	webp := webpackStats{}
+	webp := WebpackStats{}
 	err = decoder.Decode(&webp)
 	if err != nil {
 		panic(err)
@@ -35,8 +36,8 @@ func load(filename string) *webpackStats {
 	return &webp
 }
 
-// WebpackStats ..
-func WebpackStats(filename string) template.FuncMap {
+// WebpackUrlFuncMap ..
+func WebpackUrlFuncMap(filename string) template.FuncMap {
 	webp := load(filename)
 	if webp.Status != "done" {
 		panic(webp)
