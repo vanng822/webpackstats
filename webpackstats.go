@@ -36,7 +36,7 @@ func load(filename string) *WebpackStats {
 	return &webp
 }
 
-// WebpackUrlFuncMap ..
+// WebpackUrlFuncMap a FuncMap with template function webpackUrl(name string) string
 func WebpackUrlFuncMap(filename string) template.FuncMap {
 	webp := load(filename)
 	if webp.Status != "done" {
