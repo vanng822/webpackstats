@@ -80,7 +80,11 @@ func WebpackURLFuncMap(filename string) template.FuncMap {
 	go LoadStats(filename)
 	var templateFuncs = template.FuncMap{
 		"webpackUrl": func(name string) string {
-			if entry, ok := Get().Chunks[name]; ok {
+			wps := Get()
+			if wps == nil {
+				return ""
+			}
+			if entry, ok := wps.Chunks[name]; ok {
 				if len(entry) == 1 {
 					if entry[0].PublicPath != "" {
 						return entry[0].PublicPath
