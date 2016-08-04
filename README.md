@@ -5,7 +5,7 @@
 
   ```go
   templates := template.New("")
-  templates = templates.Funcs(webpackstats.WebpackUrlFuncMap("/path/to/stats.json"))
+  templates = templates.Funcs(webpackstats.WebpackURLFuncMap("/path/to/stats.json"))
   templates = template.Must(templates.ParseGlob("templates/*"))
   ```
 
