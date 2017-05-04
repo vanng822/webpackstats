@@ -15,6 +15,19 @@ type WebpackStats struct {
 	File    string                  `json:"file"`
 }
 
+// GetUrl returns the public path of an chunk
+func (wps *WebpackStats) GetUrl(name string) string {
+	if entry, ok := wps.Chunks[name]; ok {
+		if len(entry) == 1 {
+			if entry[0].PublicPath != "" {
+				return entry[0].PublicPath
+			}
+			return entry[0].Name
+		}
+	}
+	return ""
+}
+
 // general output
 type ChunkEntry struct {
 	Name       string `json:"name"`
@@ -51,6 +64,7 @@ func Get() *WebpackStats {
 	return _webpackStats
 }
 
+// LoadStats fetch stats async, if build process going on it will wait
 func LoadStats(filename string) {
 	var webp *WebpackStats
 	// this is for development
@@ -84,15 +98,7 @@ func WebpackURLFuncMap(filename string) template.FuncMap {
 			if wps == nil {
 				return ""
 			}
-			if entry, ok := wps.Chunks[name]; ok {
-				if len(entry) == 1 {
-					if entry[0].PublicPath != "" {
-						return entry[0].PublicPath
-					}
-					return entry[0].Name
-				}
-			}
-			return ""
+			return wps.GetUrl(name)
 		},
 	}
 	return templateFuncs
