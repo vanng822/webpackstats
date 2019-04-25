@@ -3,6 +3,7 @@ package webpackstats
 import (
 	"encoding/json"
 	"html/template"
+	"io"
 	"os"
 	"time"
 )
@@ -41,13 +42,21 @@ func load(filename string) *WebpackStats {
 		panic(err)
 	}
 	defer file.Close()
-	decoder := json.NewDecoder(file)
-	webp := WebpackStats{}
-	err = decoder.Decode(&webp)
+	webp, err := parse(file)
 	if err != nil {
 		panic(err)
 	}
-	return &webp
+	return webp
+}
+
+func parse(file io.Reader) (*WebpackStats, error) {
+	decoder := json.NewDecoder(file)
+	webp := WebpackStats{}
+	err := decoder.Decode(&webp)
+	if err != nil {
+		return nil, err
+	}
+	return &webp, nil
 }
 
 var (
@@ -89,17 +98,32 @@ readLoop:
 	Set(webp)
 }
 
+var templateFuncs = template.FuncMap{
+	"webpackUrl": func(name string) string {
+		wps := Get()
+		if wps == nil {
+			return ""
+		}
+		return wps.GetUrl(name)
+	},
+}
+
+// WebpackURL is a FuncMap for template function
+// to map the resource url into the resource hash url
+func WebpackURL(file io.Reader) template.FuncMap {
+	webp, err := parse(file)
+	if err != nil {
+		panic(err)
+	}
+	if webp.Status == "error" {
+		panic(webp)
+	}
+	Set(webp)
+	return templateFuncs
+}
+
 // WebpackURLFuncMap a FuncMap with template function webpackUrl(name string) string
 func WebpackURLFuncMap(filename string) template.FuncMap {
 	go LoadStats(filename)
-	var templateFuncs = template.FuncMap{
-		"webpackUrl": func(name string) string {
-			wps := Get()
-			if wps == nil {
-				return ""
-			}
-			return wps.GetUrl(name)
-		},
-	}
 	return templateFuncs
 }
