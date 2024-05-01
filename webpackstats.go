@@ -2,6 +2,7 @@ package webpackstats
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"io"
 	"os"
@@ -9,28 +10,27 @@ import (
 )
 
 type WebpackStats struct {
-	Status  string                  `json:"status"`
-	Chunks  map[string][]ChunkEntry `json:"chunks"`
-	Error   string                  `json:"error"`
-	Message string                  `json:"message"`
-	File    string                  `json:"file"`
+	Status  string              `json:"status"`
+	Chunks  map[string][]string `json:"chunks"`
+	Assets  map[string]Asset    `json:"assets"`
+	Error   string              `json:"error"`
+	Message string              `json:"message"`
+	File    string              `json:"file"`
 }
 
 // GetUrl returns the public path of an chunk
 func (wps *WebpackStats) GetUrl(name string) string {
-	if entry, ok := wps.Chunks[name]; ok {
-		if len(entry) == 1 {
-			if entry[0].PublicPath != "" {
-				return entry[0].PublicPath
-			}
-			return entry[0].Name
+	if asset, ok := wps.Assets[name]; ok {
+		if asset.PublicPath != "" {
+			return asset.PublicPath
 		}
+		return asset.Name
 	}
 	return ""
 }
 
 // general output
-type ChunkEntry struct {
+type Asset struct {
 	Name       string `json:"name"`
 	Path       string `json:"path"`
 	PublicPath string `json:"publicPath"`
@@ -41,6 +41,7 @@ func load(filename string) *WebpackStats {
 	if err != nil {
 		panic(err)
 	}
+
 	defer file.Close()
 	webp, err := parse(file)
 	if err != nil {
@@ -104,7 +105,32 @@ var templateFuncs = template.FuncMap{
 		if wps == nil {
 			return ""
 		}
-		return wps.GetUrl(name)
+		chunks, ok := wps.Chunks[name]
+
+		if !ok {
+			return ""
+		}
+
+		if len(chunks) != 1 {
+			panic("We have more then one chunk")
+		}
+
+		return wps.GetUrl(chunks[0])
+	},
+	"webpackScripts": func(name string) string {
+		wps := Get()
+		if wps == nil {
+			return ""
+		}
+		chunks, ok := wps.Chunks[name]
+		if !ok {
+			return ""
+		}
+		result := ""
+		for _, chunk := range chunks {
+			result = fmt.Sprintf("%s<script src=\"%s\"></script>", result, wps.GetUrl(chunk))
+		}
+		return result
 	},
 }
 
