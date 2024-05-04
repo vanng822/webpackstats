@@ -9,6 +9,19 @@
   templates = template.Must(templates.ParseGlob("templates/*"))
   ```
 
+  Bundle with single chunk
   ```html
   <script type="text/javascript" src="{{webpackUrl "bundle"}}"></script>
+  ```
+
+  Loop through chunks of the bundle
+  ```html
+  {{- range $bundleUrl := webpackUrls "bundle" }}
+    <script type="text/javascript" src="{{ $bundleUrl }}"></script>
+  {{- end }}
+  ```
+
+  Generate scripts for all chunks of the bundle
+  ```html
+  {{webpackScripts "bundle"}}
   ```
