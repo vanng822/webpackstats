@@ -112,12 +112,28 @@ var templateFuncs = template.FuncMap{
 		}
 
 		if len(chunks) != 1 {
-			panic("We have more then one chunk")
+			panic("We have more then one chunk, please use webpackUrls or webpackScripts")
 		}
 
 		return wps.GetUrl(chunks[0])
 	},
-	"webpackScripts": func(name string) string {
+	"webpackUrls": func(name string) []string {
+		result := []string{}
+		wps := Get()
+		if wps == nil {
+			return result
+		}
+		chunks, ok := wps.Chunks[name]
+		if !ok {
+			return result
+		}
+
+		for _, chunk := range chunks {
+			result = append(result, wps.GetUrl(chunk))
+		}
+		return result
+	},
+	"webpackScripts": func(name string) template.HTML {
 		wps := Get()
 		if wps == nil {
 			return ""
@@ -128,9 +144,9 @@ var templateFuncs = template.FuncMap{
 		}
 		result := ""
 		for _, chunk := range chunks {
-			result = fmt.Sprintf("%s<script src=\"%s\"></script>", result, wps.GetUrl(chunk))
+			result = fmt.Sprintf("%s<script src=\"%s\" type=\"text/javascript\"></script>", result, wps.GetUrl(chunk))
 		}
-		return result
+		return template.HTML(result)
 	},
 }
 
