@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io"
 	"os"
+	"sync/atomic"
 	"time"
 )
 
@@ -61,17 +62,17 @@ func parse(file io.Reader) (*WebpackStats, error) {
 }
 
 var (
-	_webpackStats *WebpackStats
+	_webpackStats atomic.Pointer[WebpackStats]
 )
 
 // Set webpack stats
 func Set(wps *WebpackStats) {
-	_webpackStats = wps
+	_webpackStats.Store(wps)
 }
 
 // Get returning current webpack stats
 func Get() *WebpackStats {
-	return _webpackStats
+	return _webpackStats.Load()
 }
 
 // LoadStats fetch stats async, if build process going on it will wait
