@@ -3,12 +3,12 @@
   "assets": {
     "eaa317ae95015ffabf05.js": {
       "name": "eaa317ae95015ffabf05.js",
-      "path": "/Users/van.nhu.nguyen@m10s.io/Documents/home_stuffs/github/gamlich/public/dist/js/eaa317ae95015ffabf05.js",
+      "path": "~/github/webpackstats/public/dist/js/eaa317ae95015ffabf05.js",
       "publicPath": "/assets/dist/js/eaa317ae95015ffabf05.js"
     },
     "eaa317ae95015ffabf05.js.LICENSE.txt": {
       "name": "eaa317ae95015ffabf05.js.LICENSE.txt",
-      "path": "/Users/van.nhu.nguyen@m10s.io/Documents/home_stuffs/github/gamlich/public/dist/js/eaa317ae95015ffabf05.js.LICENSE.txt",
+      "path": "~/github/webpackstats/public/dist/js/eaa317ae95015ffabf05.js.LICENSE.txt",
       "publicPath": "/assets/dist/js/eaa317ae95015ffabf05.js.LICENSE.txt"
     }
   },
